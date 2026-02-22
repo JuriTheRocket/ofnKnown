@@ -1,0 +1,2233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Organisation of Free Nations — Walkthrough</title>
+  <meta name="description" content="A colorful, European-style, drag-to-walk walkthrough of the Organisation of Free Nations (OFN)." />
+
+  <style>
+    :root{
+      --white:#ffffff;
+      --blue:#0b4fd8;
+      --blue2:#0a2f8f;
+
+      --a1:#ff4d6d;
+      --a2:#ffb703;
+      --a3:#2dd4bf;
+      --a4:#7c3aed;
+
+      --ink:#0b1220;
+
+      --glass: rgba(255,255,255,.84);
+      --shadow: 0 16px 42px rgba(11,18,32,.14);
+      --shadow2: 0 10px 26px rgba(11,18,32,.10);
+
+      --radius: 18px;
+
+      --horizonY: 72%;
+      --cardW: 420px;
+      --camY: 0px;
+
+      /* station-specific palette vars */
+      --bgA: rgba(255,183,3,.20);
+      --bgB: rgba(124,58,237,.16);
+      --bgC: rgba(45,212,191,.16);
+      --bgBase1: #ffffff;
+      --bgBase2: #f4f8ff;
+      --bgBase3: #eef5ff;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+    }
+
+    *{ box-sizing:border-box; }
+    html, body { height:100%; }
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 700px at 18% 12%, var(--bgA), transparent 55%),
+        radial-gradient(1200px 700px at 82% 18%, var(--bgB), transparent 58%),
+        radial-gradient(1200px 700px at 70% 76%, var(--bgC), transparent 55%),
+        linear-gradient(180deg, var(--bgBase1) 0%, var(--bgBase2) 55%, var(--bgBase3) 100%);
+      overflow:hidden;
+      transition: background .45s ease;
+    }
+
+    .paperNoise{
+      position:fixed; inset:0;
+      pointer-events:none;
+      background:
+        repeating-linear-gradient(0deg,
+          rgba(11,18,32,.02) 0px,
+          rgba(11,18,32,.02) 1px,
+          transparent 2px,
+          transparent 4px);
+      opacity:.32;
+      mix-blend-mode:multiply;
+      z-index:0;
+    }
+
+    /* Ambient life */
+    .ambient{ position:fixed; inset:0; pointer-events:none; z-index:1; }
+    .cloud{
+      position:absolute;
+      top: 9%;
+      width: 240px; height: 80px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.85);
+      box-shadow:
+        60px 10px 0 rgba(255,255,255,.85),
+        110px 20px 0 rgba(255,255,255,.75),
+        160px 8px 0 rgba(255,255,255,.80);
+      filter: blur(.3px);
+      opacity:.75;
+      animation: cloudDrift 42s linear infinite;
+    }
+    .cloud.c2{ top: 15%; width: 300px; height: 86px; opacity:.55; animation-duration: 55s; }
+    .cloud.c3{ top: 22%; width: 210px; height: 74px; opacity:.45; animation-duration: 66s; }
+    @keyframes cloudDrift{
+      from{ transform: translateX(-420px); }
+      to{ transform: translateX(calc(100vw + 520px)); }
+    }
+
+    /* Boot overlay */
+    .boot{
+      position:fixed; inset:0;
+      background:
+        radial-gradient(1200px 700px at 50% 35%, rgba(11,79,216,.12), transparent 60%),
+        linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+      display:grid;
+      place-items:center;
+      z-index:999;
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .boot.hidden{
+      opacity:0;
+      transform: translateY(-8px);
+      pointer-events:none;
+    }
+    .scan{
+      position:absolute; left:-20%; right:-20%;
+      height:140px;
+      top:-180px;
+      background: linear-gradient(180deg, transparent, rgba(11,79,216,.08), transparent);
+      filter: blur(2px);
+      animation: scan 2.4s linear infinite;
+      opacity:.7;
+      pointer-events:none;
+    }
+    @keyframes scan{
+      0%{ transform: translateY(0); }
+      100%{ transform: translateY(calc(100vh + 360px)); }
+    }
+    .bootCard{
+      width:min(760px, calc(100vw - 28px));
+      border-radius: 22px;
+      background: rgba(255,255,255,.88);
+      border: 1px solid rgba(11,79,216,.22);
+      box-shadow: 0 24px 64px rgba(11,18,32,.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+    .bootTop{
+      padding:18px 18px 14px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      border-bottom:1px solid rgba(11,18,32,.08);
+      background:
+        linear-gradient(90deg,
+          rgba(11,79,216,.10),
+          rgba(255,183,3,.10),
+          rgba(45,212,191,.10),
+          rgba(124,58,237,.08));
+    }
+    .bootLogo{
+      width:46px; height:46px;
+      border-radius: 16px;
+      border:1px solid rgba(11,79,216,.24);
+      background:
+        radial-gradient(16px 16px at 32% 28%, rgba(11,79,216,.35), transparent 62%),
+        radial-gradient(18px 18px at 68% 70%, rgba(255,183,3,.30), transparent 62%),
+        linear-gradient(145deg, rgba(255,255,255,.92), rgba(255,255,255,.55));
+      box-shadow: 0 10px 24px rgba(11,79,216,.10);
+    }
+    .bootTitle h1{
+      margin:0;
+      font-size:13px;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      color: rgba(11,18,32,.88);
+    }
+    .bootTitle p{
+      margin:4px 0 0;
+      font-size:12px;
+      color: rgba(11,18,32,.62);
+      line-height:1.25;
+    }
+    .bootBody{ padding:16px 18px 18px; }
+    .bootLine{
+      font-family: var(--mono);
+      font-size:12px;
+      color: rgba(11,18,32,.70);
+      line-height:1.5;
+      white-space:pre-wrap;
+      margin:0 0 12px;
+    }
+    .bootBar{
+      height:12px;
+      border-radius:999px;
+      background: rgba(11,18,32,.06);
+      border:1px solid rgba(11,18,32,.10);
+      overflow:hidden;
+    }
+    .bootBar > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(11,79,216,.85), rgba(45,212,191,.85), rgba(255,183,3,.85));
+      box-shadow: 0 0 22px rgba(11,79,216,.18);
+      transition: width .25s ease;
+    }
+
+    /* HUD */
+    .hud{
+      position:fixed; left:18px; right:18px; top:16px;
+      display:flex; gap:12px; align-items:stretch; justify-content:space-between;
+      z-index:80;
+    }
+    .panel{
+      background: var(--glass);
+      border:1px solid rgba(11,79,216,.22);
+      border-radius: 16px;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+      padding:12px 14px;
+      min-width: 360px;
+    }
+    .badge{
+      width:40px; height:40px; border-radius:12px;
+      border:1px solid rgba(11,79,216,.24);
+      background:
+        radial-gradient(14px 14px at 30% 30%, rgba(11,79,216,.28), transparent 62%),
+        radial-gradient(16px 16px at 65% 70%, rgba(255,183,3,.22), transparent 65%),
+        linear-gradient(145deg, rgba(255,255,255,.90), rgba(255,255,255,.55));
+      box-shadow: 0 10px 22px rgba(11,79,216,.10);
+    }
+    .brand h1{
+      font-size:14px; margin:0;
+      letter-spacing:.08em; text-transform:uppercase;
+      color: rgba(11,18,32,.92);
+    }
+    .brand p{
+      margin:2px 0 0;
+      font-size:12px; color: rgba(11,18,32,.62);
+      line-height:1.25;
+    }
+
+    .controls{
+      padding:10px 12px;
+      display:flex; gap:10px; align-items:center;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .hint{
+      font-size:12px; color: rgba(11,18,32,.62);
+      line-height:1.2;
+      padding-right:4px;
+      white-space:nowrap;
+    }
+    .kbd{
+      display:inline-block;
+      padding:2px 6px;
+      margin:0 3px;
+      border-radius:8px;
+      border:1px solid rgba(11,18,32,.12);
+      background: rgba(255,255,255,.75);
+      color: rgba(11,18,32,.86);
+      font-size:11px;
+      box-shadow: 0 6px 14px rgba(11,18,32,.07);
+    }
+    .btn{
+      appearance:none;
+      border:1px solid rgba(11,79,216,.22);
+      background: rgba(255,255,255,.90);
+      color: rgba(11,18,32,.92);
+      padding:9px 10px;
+      border-radius:12px;
+      font-size:12px;
+      cursor:pointer;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+      box-shadow: 0 10px 18px rgba(11,18,32,.08);
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(11,79,216,.38);
+      box-shadow: 0 14px 22px rgba(11,18,32,.10);
+      background: rgba(255,255,255,.96);
+    }
+    .btn.primary{
+      background: linear-gradient(90deg, rgba(11,79,216,.92), rgba(10,47,143,.92));
+      border-color: rgba(11,79,216,.45);
+      color: white;
+    }
+
+    .seg{
+      display:flex;
+      border:1px solid rgba(11,79,216,.22);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow: 0 10px 18px rgba(11,18,32,.08);
+      background: rgba(255,255,255,.86);
+    }
+    .seg button{
+      border:0;
+      background: transparent;
+      padding:9px 10px;
+      cursor:pointer;
+      font-size:12px;
+      color: rgba(11,18,32,.82);
+    }
+    .seg button.active{
+      background: rgba(11,79,216,.10);
+      color: rgba(11,79,216,.95);
+      font-weight: 650;
+    }
+
+    .progressWrap{
+      padding:10px 12px;
+      min-width: 340px;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .row{
+      display:flex; justify-content:space-between; align-items:center;
+      font-size:12px; color: rgba(11,18,32,.62);
+      gap:10px;
+      white-space:nowrap;
+    }
+    .bar{
+      height:10px; border-radius:999px;
+      background: rgba(11,18,32,.06);
+      border:1px solid rgba(11,18,32,.10);
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block; height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(11,79,216,.90), rgba(45,212,191,.80), rgba(255,183,3,.85), rgba(255,77,109,.80));
+      box-shadow: 0 0 18px rgba(11,79,216,.16);
+    }
+
+    /* Route map */
+    .routeMap{
+      position:fixed;
+      left:18px;
+      right:18px;
+      bottom:16px;
+      z-index:90;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.82);
+      border:1px solid rgba(11,79,216,.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 14px 30px rgba(11,18,32,.10);
+    }
+    .routeLabel{
+      font-size:12px;
+      color: rgba(11,18,32,.62);
+      white-space:nowrap;
+    }
+    .routeDots{
+      flex:1;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      overflow:auto;
+      padding:2px 2px;
+      scrollbar-width: thin;
+    }
+    .dot{
+      width:10px; height:10px;
+      border-radius:50%;
+      border:1px solid rgba(11,79,216,.24);
+      background: rgba(11,79,216,.10);
+      position:relative;
+      flex:0 0 auto;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .dot:hover{ transform: translateY(-1px) scale(1.05); border-color: rgba(11,79,216,.40); }
+    .dot.active{
+      background: rgba(11,79,216,.85);
+      border-color: rgba(11,79,216,.85);
+      box-shadow: 0 0 0 6px rgba(11,79,216,.10);
+    }
+    .dot:after{
+      content: attr(data-title);
+      position:absolute;
+      left:50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(11,79,216,.18);
+      color: rgba(11,18,32,.76);
+      font-size:11px;
+      padding:6px 8px;
+      border-radius: 12px;
+      white-space:nowrap;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .15s ease, transform .15s ease;
+      box-shadow: 0 10px 22px rgba(11,18,32,.10);
+    }
+    .dot:hover:after{ opacity:1; transform: translateX(-50%) translateY(-2px); }
+
+    /* Stage */
+    .stage{
+      position:fixed; inset:0;
+      touch-action: pan-y;
+      user-select:none;
+      cursor: grab;
+      z-index:10;
+    }
+    .stage.dragging{ cursor: grabbing; }
+
+    .world{
+      position:absolute;
+      left:0; top:0;
+      height:100%;
+      transform: translate3d(0, var(--camY), 0);
+      will-change: transform;
+      z-index:10;
+    }
+
+    /* Skyline — more “above horizon” so stations don’t sit on top of it visually */
+    .skyline{
+      position:fixed; inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:2;
+    }
+    .layer{
+      position:absolute; left:0; top:0;
+      width:100%; height:100%;
+      will-change: transform;
+    }
+    .buildBack{
+      top: 6%;
+      height: 56%;
+      opacity:.45;
+      background:
+        linear-gradient(180deg, transparent 0%, rgba(11,79,216,.07) 30%, rgba(11,79,216,.05) 100%),
+        repeating-linear-gradient(90deg,
+          rgba(11,79,216,.10) 0px,
+          rgba(11,79,216,.10) 22px,
+          transparent 22px,
+          transparent 44px),
+        linear-gradient(180deg, rgba(11,79,216,.08), rgba(11,79,216,.04));
+      mask-image: linear-gradient(180deg, transparent 0%, black 14%, black 68%, transparent 100%);
+      -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 14%, black 68%, transparent 100%);
+    }
+    .buildMid{
+      top: 14%;
+      height: 56%;
+      opacity:.62;
+      background:
+        linear-gradient(180deg, transparent 0%, rgba(11,79,216,.09) 30%, rgba(11,79,216,.06) 100%),
+        repeating-linear-gradient(90deg,
+          rgba(11,18,32,.09) 0px,
+          rgba(11,18,32,.09) 28px,
+          transparent 28px,
+          transparent 56px),
+        radial-gradient(900px 220px at 50% 70%, rgba(255,183,3,.10), transparent 70%);
+      mask-image: linear-gradient(180deg, transparent 0%, black 14%, black 74%, transparent 100%);
+      -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 14%, black 74%, transparent 100%);
+    }
+    .buildFront{
+      top: 22%;
+      height: 56%;
+      opacity:.78;
+      background:
+        radial-gradient(900px 260px at 55% 62%, rgba(11,79,216,.10), transparent 70%),
+        repeating-linear-gradient(90deg,
+          rgba(11,79,216,.12) 0px,
+          rgba(11,79,216,.12) 34px,
+          rgba(255,255,255,.00) 34px,
+          rgba(255,255,255,.00) 66px),
+        linear-gradient(180deg, rgba(11,79,216,.05), rgba(11,79,216,.03));
+      mask-image: linear-gradient(180deg, transparent 0%, black 16%, black 88%, transparent 100%);
+      -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 16%, black 88%, transparent 100%);
+    }
+
+    /* Ground / path */
+    .path{
+      position:absolute;
+      left:0; right:0;
+      top: var(--horizonY);
+      height: 6px;
+      background:
+        linear-gradient(90deg,
+          transparent,
+          rgba(11,79,216,.28),
+          rgba(255,183,3,.22),
+          rgba(45,212,191,.22),
+          rgba(124,58,237,.18),
+          transparent);
+      border-radius:999px;
+      filter: drop-shadow(0 6px 18px rgba(11,79,216,.10));
+    }
+    .groundGlow{
+      position:absolute;
+      left:0; right:0;
+      top: calc(var(--horizonY) - 90px);
+      height:280px;
+      background:
+        radial-gradient(1200px 220px at 45% 38%, rgba(11,79,216,.12), transparent 62%),
+        radial-gradient(1000px 220px at 60% 55%, rgba(255,183,3,.10), transparent 65%),
+        radial-gradient(1100px 220px at 50% 60%, rgba(45,212,191,.10), transparent 65%);
+      opacity:.85;
+      pointer-events:none;
+    }
+
+    /* Station */
+    .station{
+      position:absolute;
+      top: calc(var(--horizonY) - 210px);
+      width: 360px;
+      height: 280px;
+      transform: translateX(-50%);
+      opacity:0;
+      transition: opacity .28s ease, transform .28s ease;
+      pointer-events:none;
+      z-index:3; /* below HUD, above world */
+      filter: drop-shadow(0 18px 28px rgba(11,18,32,.14));
+    }
+    .station.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-2px);
+      pointer-events:auto;
+    }
+
+    /* Scenic image panel behind the station (so it is NOT covered by plaque) */
+    .scenic{
+      position:absolute;
+      left:50%;
+      bottom: 96px;
+      transform: translateX(-50%);
+      width: 340px;
+      height: 110px;
+      border-radius: 18px;
+      border:1px solid rgba(11,79,216,.18);
+      background: rgba(255,255,255,.70);
+      overflow:hidden;
+      box-shadow: 0 18px 38px rgba(11,18,32,.10);
+      opacity:0;
+      transition: opacity .28s ease;
+      pointer-events:none;
+      z-index:1;
+    }
+    .station.show .scenic{ opacity:.95; }
+    .scenic .img{
+      position:absolute; inset:0;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(1.05) contrast(1.03);
+    }
+    .scenic .wash{
+      position:absolute; inset:0;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.28), rgba(255,255,255,.06), rgba(255,255,255,.24)),
+        radial-gradient(700px 160px at 40% 50%, rgba(11,79,216,.10), transparent 65%);
+      mix-blend-mode: screen;
+      opacity:.75;
+    }
+
+    .plaza{
+      position:absolute; left:50%; bottom:0;
+      width: 320px; height: 72px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(11,79,216,.20);
+      box-shadow: 0 18px 44px rgba(11,18,32,.12);
+      overflow:hidden;
+      z-index:2;
+    }
+    .plaza:before{
+      content:"";
+      position:absolute; inset:10px 18px;
+      border-radius: 999px;
+      background:
+        linear-gradient(90deg,
+          rgba(11,79,216,.06),
+          rgba(255,183,3,.06),
+          rgba(45,212,191,.06),
+          rgba(124,58,237,.05));
+      border:1px solid rgba(11,18,32,.06);
+    }
+
+    .building{
+      position:absolute;
+      left:50%;
+      bottom: 40px;
+      transform: translateX(-50%);
+      width: 170px;
+      height: 128px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.95);
+      border:1px solid rgba(11,79,216,.22);
+      overflow:hidden;
+      will-change: transform;
+      z-index:2;
+    }
+    .building:before{
+      content:"";
+      position:absolute; left:-10px; right:-10px; top:-22px;
+      height: 44px;
+      background:
+        linear-gradient(90deg,
+          rgba(11,79,216,.16),
+          rgba(255,183,3,.14),
+          rgba(45,212,191,.14),
+          rgba(124,58,237,.12));
+      border-bottom:1px solid rgba(11,18,32,.08);
+      transform: skewX(-14deg);
+      opacity:.85;
+    }
+    .windows{
+      position:absolute; left:18px; right:18px; top:46px; bottom:16px;
+      background:
+        repeating-linear-gradient(90deg,
+          rgba(11,79,216,.12) 0px,
+          rgba(11,79,216,.12) 14px,
+          transparent 14px,
+          transparent 26px),
+        repeating-linear-gradient(180deg,
+          rgba(11,79,216,.10) 0px,
+          rgba(11,79,216,.10) 12px,
+          transparent 12px,
+          transparent 22px);
+      border-radius: 12px;
+      opacity:.55;
+    }
+    .door{
+      position:absolute;
+      left:50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 34px; height: 46px;
+      border-radius: 10px 10px 0 0;
+      background: rgba(11,79,216,.10);
+      border: 1px solid rgba(11,79,216,.18);
+    }
+
+    /* Crowd */
+    .crowd{
+      position:absolute;
+      left:50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      width: 240px;
+      height: 50px;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity .25s ease;
+      z-index:3;
+    }
+    .station.near .crowd{ opacity:1; }
+    .person{
+      position:absolute;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(11,79,216,.30);
+      box-shadow: 0 0 0 4px rgba(11,79,216,.06);
+      opacity:.9;
+      animation: bob 2.4s ease-in-out infinite;
+    }
+    .person.p2{ background: rgba(255,183,3,.32); box-shadow: 0 0 0 4px rgba(255,183,3,.08); animation-duration: 2.8s; }
+    .person.p3{ background: rgba(45,212,191,.32); box-shadow: 0 0 0 4px rgba(45,212,191,.08); animation-duration: 2.2s; }
+    .person.p4{ background: rgba(124,58,237,.28); box-shadow: 0 0 0 4px rgba(124,58,237,.08); animation-duration: 3.1s; }
+    @keyframes bob{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-3px); } }
+
+    /* Compact plaque (offset to the side/top so it doesn’t cover scenic image) */
+    .plaque{
+      position:absolute;
+      left: 50%;
+      top: -26px;
+      transform: translateX(-50%);
+      width: var(--cardW);
+      max-width: calc(100vw - 40px);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(11,79,216,.20);
+      box-shadow: var(--shadow);
+      padding: 12px 12px 10px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .28s ease, transform .28s ease, border-color .28s ease, box-shadow .28s ease;
+      z-index:4;
+    }
+    .plaque.show{
+      opacity:1;
+      pointer-events:auto;
+      transform: translateX(-50%) translateY(-6px);
+    }
+    .plaque.arrive{ animation: arrive .36s ease-out both; }
+    @keyframes arrive{
+      0%{ transform: translateX(-50%) translateY(10px); opacity:0; }
+      100%{ transform: translateX(-50%) translateY(-6px); opacity:1; }
+    }
+    .plaque.active{
+      border-color: rgba(11,79,216,.42);
+      box-shadow: 0 22px 58px rgba(11,18,32,.16);
+    }
+
+    .kicker{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom:8px;
+    }
+    .chip{
+      font-size:11px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color: rgba(11,18,32,.78);
+      background: rgba(11,79,216,.08);
+      border:1px solid rgba(11,79,216,.20);
+      padding:6px 8px;
+      border-radius: 999px;
+      white-space:nowrap;
+    }
+    .tag{
+      font-size:11px;
+      color: rgba(11,79,216,.90);
+      border:1px solid rgba(11,79,216,.20);
+      background: rgba(255,255,255,.72);
+      padding:6px 8px;
+      border-radius:999px;
+      white-space:nowrap;
+    }
+    .plaque h2{
+      margin:0 0 6px;
+      font-size:15px;
+      letter-spacing:.02em;
+      color: rgba(11,18,32,.92);
+    }
+    .plaque p{
+      margin:0;
+      font-size:13px;
+      color: rgba(11,18,32,.68);
+      line-height:1.45;
+    }
+    .plaque ul{
+      margin:10px 0 0;
+      padding-left:18px;
+      color: rgba(11,18,32,.68);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .plaque li{ margin:4px 0; }
+    .plaqueFooter{
+      display:flex;
+      gap:10px;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+
+    /* Avatar */
+    .avatar{
+      position:fixed;
+      left:50%;
+      top: calc(var(--horizonY) - 26px);
+      transform: translate(-50%, -50%);
+      width: 70px; height: 70px;
+      z-index:60;
+      display:grid; place-items:center;
+      pointer-events:none;
+      filter: drop-shadow(0 18px 22px rgba(11,18,32,.18));
+      transition: opacity .4s ease;
+    }
+    .avatar.fade{ opacity:0; }
+    .bubble{
+      position:absolute;
+      top:-56px;
+      left:50%;
+      transform: translateX(-50%);
+      padding:8px 10px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(11,79,216,.18);
+      color: rgba(11,18,32,.76);
+      font-size:12px;
+      white-space:nowrap;
+      opacity:0;
+      transition: opacity .2s ease, transform .2s ease;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 12px 28px rgba(11,18,32,.10);
+    }
+    .bubble.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+    .guy{
+      width: 48px; height: 48px;
+      border-radius: 18px;
+      border:1px solid rgba(11,79,216,.20);
+      background:
+        radial-gradient(16px 16px at 30% 30%, rgba(11,79,216,.22), transparent 62%),
+        radial-gradient(18px 18px at 70% 75%, rgba(255,183,3,.18), transparent 65%),
+        linear-gradient(145deg, rgba(255,255,255,.92), rgba(255,255,255,.58));
+      position:relative;
+      overflow:hidden;
+      box-shadow: 0 18px 34px rgba(11,18,32,.14);
+    }
+    .guy:before{
+      content:"";
+      position:absolute;
+      left:11px; top:14px;
+      width:6px; height:6px;
+      border-radius:50%;
+      background: rgba(11,18,32,.70);
+      box-shadow: 18px 0 0 rgba(11,18,32,.70);
+      opacity:.9;
+    }
+    .legs{
+      position:absolute;
+      bottom:-7px; left:50%;
+      transform: translateX(-50%);
+      width: 44px; height: 16px;
+    }
+    .leg{
+      position:absolute; bottom:0;
+      width: 13px; height: 13px;
+      border-radius: 7px;
+      background: rgba(11,79,216,.14);
+      border:1px solid rgba(11,79,216,.16);
+      transform-origin: top center;
+    }
+    .leg.left{ left:6px; }
+    .leg.right{ right:6px; }
+    .walking .leg.left{ animation: stepL .30s infinite ease-in-out; }
+    .walking .leg.right{ animation: stepR .30s infinite ease-in-out; }
+    @keyframes stepL{ 0%,100%{ transform: rotate(10deg) translateY(0);} 50%{ transform: rotate(-16deg) translateY(2px);} }
+    @keyframes stepR{ 0%,100%{ transform: rotate(-10deg) translateY(0);} 50%{ transform: rotate(16deg) translateY(2px);} }
+
+    /* Drawer */
+    .drawer{
+      position:fixed;
+      top: 92px;
+      right: 18px;
+      width: min(520px, calc(100vw - 36px));
+      max-height: calc(100vh - 130px);
+      background: rgba(255,255,255,.94);
+      border: 1px solid rgba(11,79,216,.22);
+      border-radius: 20px;
+      box-shadow: 0 26px 70px rgba(11,18,32,.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+      transform: translateX(calc(100% + 30px));
+      opacity:0;
+      transition: transform .28s ease, opacity .28s ease;
+      z-index:9999;
+    }
+    .drawer.show{
+      transform: translateX(0);
+      opacity:1;
+    }
+    .drawerTop{
+      padding:14px 14px 12px;
+      border-bottom:1px solid rgba(11,18,32,.08);
+      background: linear-gradient(90deg, rgba(11,79,216,.10), rgba(255,183,3,.10), rgba(45,212,191,.10), rgba(124,58,237,.08));
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .drawerTop h3{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.02em;
+      color: rgba(11,18,32,.92);
+    }
+    .drawerTop p{
+      margin:6px 0 0;
+      font-size:12px;
+      color: rgba(11,18,32,.66);
+      line-height:1.35;
+    }
+    .drawerBody{
+      padding:14px;
+      overflow:auto;
+      max-height: calc(100vh - 210px);
+    }
+    .drawerBody h4{
+      margin:0 0 8px;
+      font-size:13px;
+      color: rgba(11,18,32,.88);
+      letter-spacing:.02em;
+    }
+    .drawerBody .block{
+      border:1px solid rgba(11,79,216,.16);
+      background: rgba(11,79,216,.04);
+      border-radius: 16px;
+      padding:12px;
+      margin-bottom:12px;
+    }
+    .drawerBody ul{
+      margin:8px 0 0;
+      padding-left:18px;
+      color: rgba(11,18,32,.70);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .drawerBody li{ margin:4px 0; }
+
+    /* Charter warning modal */
+    .modal{
+      position:fixed; inset:0;
+      display:grid;
+      place-items:center;
+      background: rgba(11,18,32,.34);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .2s ease;
+      z-index:10000;
+      padding: 18px;
+    }
+    .modal.show{ opacity:1; pointer-events:auto; }
+    .modalCard{
+      width:min(640px, 100%);
+      border-radius: 22px;
+      background: rgba(255,255,255,.94);
+      border:1px solid rgba(11,79,216,.22);
+      box-shadow: 0 30px 80px rgba(11,18,32,.22);
+      overflow:hidden;
+    }
+    .modalTop{
+      padding:14px 14px 12px;
+      border-bottom:1px solid rgba(11,18,32,.08);
+      background: linear-gradient(90deg, rgba(11,79,216,.10), rgba(255,183,3,.10), rgba(45,212,191,.10), rgba(124,58,237,.08));
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+    .modalTop h3{
+      margin:0;
+      font-size:14px;
+      color: rgba(11,18,32,.92);
+      letter-spacing:.02em;
+    }
+    .modalBody{
+      padding:14px;
+      color: rgba(11,18,32,.72);
+      font-size:13px;
+      line-height:1.5;
+    }
+    .modalActions{
+      padding: 0 14px 14px;
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    /* Toast */
+    .toast{
+      position:fixed;
+      left:50%;
+      top: 88px;
+      transform: translateX(-50%) translateY(-10px);
+      padding:10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(11,79,216,.18);
+      color: rgba(11,18,32,.76);
+      font-size:12px;
+      white-space:nowrap;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      box-shadow: 0 16px 34px rgba(11,18,32,.12);
+      z-index:95;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(0px);
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .walking .leg.left, .walking .leg.right{ animation:none; }
+      .boot, .station, .plaque, .drawer, .btn, .toast{ transition:none; }
+      .scan, .cloud{ animation:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="paperNoise" aria-hidden="true"></div>
+
+  <div class="ambient" aria-hidden="true">
+    <div class="cloud c1" style="left:-420px; animation-delay: -6s;"></div>
+    <div class="cloud c2" style="left:-520px; animation-delay: -18s;"></div>
+    <div class="cloud c3" style="left:-360px; animation-delay: -32s;"></div>
+  </div>
+
+  <div class="boot" id="boot" aria-label="Startup">
+    <div class="scan" aria-hidden="true"></div>
+    <div class="bootCard">
+      <div class="bootTop">
+        <div class="bootLogo" aria-hidden="true"></div>
+        <div class="bootTitle">
+          <h1 id="bootH1">Organisation of Free Nations</h1>
+          <p id="bootP">Initializing institutional walkthrough…</p>
+        </div>
+      </div>
+      <div class="bootBody">
+        <pre class="bootLine" id="bootText">[OFN] Loading route…
+[OFN] Rendering Luxembourg City moment…
+[OFN] Ready…</pre>
+        <div class="bootBar" aria-hidden="true"><i id="bootFill"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <header class="hud" role="banner">
+    <section class="panel brand" aria-label="OFN header">
+      <div class="badge" aria-hidden="true"></div>
+      <div>
+        <h1 id="uiTitle">Organisation of Free Nations</h1>
+        <p id="uiSubtitle">Capital: <strong>Luxembourg City</strong>. Walk the route to learn the institutions.</p>
+      </div>
+    </section>
+
+    <section class="panel controls" aria-label="Controls">
+      <div class="hint" id="uiHint">Drag • Wheel • <span class="kbd">←</span><span class="kbd">→</span></div>
+
+      <div class="seg" role="tablist" aria-label="Mode">
+        <button id="modeFree" class="active" type="button" role="tab" aria-selected="true">Free Walk</button>
+        <button id="modeGuided" type="button" role="tab" aria-selected="false">Guided</button>
+      </div>
+
+      <div class="seg" role="tablist" aria-label="Language">
+        <button id="langEN" class="active" type="button" role="tab" aria-selected="true">EN</button>
+        <button id="langDE" type="button" role="tab" aria-selected="false">DE</button>
+        <button id="langES" type="button" role="tab" aria-selected="false">ES</button>
+      </div>
+
+      <button class="btn" id="btnCharter" type="button">Read the Charter</button>
+      <button class="btn" id="btnReset" type="button">Reset</button>
+      <button class="btn" id="btnPrev" type="button">Prev</button>
+      <button class="btn primary" id="btnNext" type="button">Next</button>
+    </section>
+
+    <section class="panel progressWrap" aria-label="Progress">
+      <div class="row">
+        <span id="progressLabel">0%</span>
+        <span id="checkpointLabel">Checkpoint: Start</span>
+      </div>
+      <div class="bar" aria-hidden="true"><i id="progressBar"></i></div>
+    </section>
+  </header>
+
+  <div class="skyline" aria-hidden="true">
+    <div class="layer buildBack" id="buildBack"></div>
+    <div class="layer buildMid" id="buildMid"></div>
+    <div class="layer buildFront" id="buildFront"></div>
+  </div>
+
+  <main class="stage" id="stage" aria-label="OFN walkthrough stage">
+    <div class="world" id="world" aria-label="Walkthrough world">
+      <div class="groundGlow" aria-hidden="true"></div>
+      <div class="path" aria-hidden="true"></div>
+      <!-- Stations injected by JS -->
+    </div>
+
+    <div class="avatar" id="avatar" aria-hidden="true">
+      <div class="bubble" id="bubble">Drag to walk</div>
+      <div class="guy" id="guy">
+        <div class="legs">
+          <div class="leg left"></div>
+          <div class="leg right"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <aside class="drawer" id="drawer" aria-label="Institution details">
+    <div class="drawerTop">
+      <div>
+        <h3 id="drawerTitle">Institution</h3>
+        <p id="drawerDesc">Details</p>
+      </div>
+      <button class="btn" id="drawerClose" type="button">Close</button>
+    </div>
+    <div class="drawerBody" id="drawerBody"></div>
+  </aside>
+
+  <section class="modal" id="charterModal" aria-label="Open charter warning" role="dialog" aria-modal="true">
+    <div class="modalCard">
+      <div class="modalTop">
+        <h3 id="charterModalTitle">Open external document</h3>
+        <button class="btn" id="charterModalX" type="button">Close</button>
+      </div>
+      <div class="modalBody" id="charterModalBody">
+        You are about to open the OFN Charter in a new page. This will take you to an external document.
+      </div>
+      <div class="modalActions">
+        <button class="btn" id="charterCancel" type="button">Cancel</button>
+        <button class="btn primary" id="charterOpen" type="button">Open new page</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="routeMap" role="navigation" aria-label="Route map">
+    <div class="routeLabel" id="routeLabel">Route</div>
+    <div class="routeDots" id="routeDots"></div>
+  </div>
+
+  <script>
+    (() => {
+      const CHARTER_URL = "https://docs.google.com/document/d/1gQ8OyhCIQ9MGeM3oLHJgRpU6Uv9yN9LXlQ5gE0n_39E/edit?usp=sharing";
+
+      // Images via Wikimedia (direct, stable).
+      const IMG_LUX = "https://commons.wikimedia.org/wiki/Special:FilePath/Luxembourg%20City%20Landscape%20Cityscape%20Panorama.jpg";
+      const IMG_BRUSSELS = "https://commons.wikimedia.org/wiki/Special:FilePath/Parlament%20Europejski%20w%20Brukseli%20-%20European%20Parliament%2C%20Brussels.jpg";
+
+      const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+      const lerp = (a,b,t)=>a+(b-a)*t;
+
+      // UI i18n
+      const UI = {
+        en:{
+          title:"Organisation of Free Nations",
+          subtitle:"Capital: Luxembourg City. Walk the route to learn the institutions.",
+          hint:"Drag • Wheel • ← →",
+          free:"Free Walk", guided:"Guided",
+          charter:"Read the Charter",
+          reset:"Reset", prev:"Prev", next:"Next",
+          details:"Details", close:"Close",
+          route:"Route",
+          checkpoint:"Checkpoint:",
+          arrived:"Arrived:",
+          dragToWalk:"Drag to walk",
+          walking:"Walking…",
+          guidedToast:"Guided mode: use Next/Prev to move station-by-station.",
+          warnTitle:"Open external document",
+          warnBody:"You are about to open the OFN Charter in a new page. This will take you to an external document.",
+          cancel:"Cancel",
+          open:"Open new page",
+          quick:"Quick overview",
+          points:"Key points"
+        },
+        de:{
+          title:"Organisation der Freien Nationen",
+          subtitle:"Hauptstadt: Luxemburg-Stadt. Laufe die Route und lerne die Institutionen kennen.",
+          hint:"Ziehen • Mausrad • ← →",
+          free:"Freier Modus", guided:"Geführt",
+          charter:"Charta lesen",
+          reset:"Start", prev:"Zurück", next:"Weiter",
+          details:"Details", close:"Schließen",
+          route:"Route",
+          checkpoint:"Station:",
+          arrived:"Angekommen:",
+          dragToWalk:"Ziehen zum Laufen",
+          walking:"Unterwegs…",
+          guidedToast:"Geführter Modus: Weiter/Zurück bewegt Station für Station.",
+          warnTitle:"Externes Dokument öffnen",
+          warnBody:"Du bist dabei, die OFN-Charta in einer neuen Seite zu öffnen. Das ist ein externes Dokument.",
+          cancel:"Abbrechen",
+          open:"Neue Seite öffnen",
+          quick:"Kurzüberblick",
+          points:"Kernpunkte"
+        },
+        es:{
+          title:"Organización de las Naciones Libres",
+          subtitle:"Capital: Ciudad de Luxemburgo. Recorre la ruta para conocer las instituciones.",
+          hint:"Arrastrar • Rueda • ← →",
+          free:"Libre", guided:"Guiado",
+          charter:"Leer la Carta",
+          reset:"Reiniciar", prev:"Atrás", next:"Siguiente",
+          details:"Detalles", close:"Cerrar",
+          route:"Ruta",
+          checkpoint:"Parada:",
+          arrived:"Llegaste a:",
+          dragToWalk:"Arrastra para caminar",
+          walking:"Caminando…",
+          guidedToast:"Modo guiado: Siguiente/Atrás para avanzar por paradas.",
+          warnTitle:"Abrir documento externo",
+          warnBody:"Vas a abrir la Carta de la OFN en una nueva página. Esto te llevará a un documento externo.",
+          cancel:"Cancelar",
+          open:"Abrir nueva página",
+          quick:"Resumen",
+          points:"Puntos clave"
+        }
+      };
+
+      // Station content i18n (your missing piece)
+      // NOTE: This is intentionally “educational”: concise, structured, readable.
+      const STATION_MODEL = [
+        {
+          id:"start",
+          chip:{en:"Luxembourg City",de:"Luxemburg-Stadt",es:"Ciudad de Luxemburgo"},
+          tag:{en:"Capital",de:"Hauptstadt",es:"Capital"},
+          title:{
+            en:"Luxembourg City — starting point",
+            de:"Luxemburg-Stadt — Startpunkt",
+            es:"Ciudad de Luxemburgo — punto de inicio"
+          },
+          text:{
+            en:"Welcome. The OFN’s capital is Luxembourg City. Begin the route here and walk station by station through purpose, principles, institutions, and operations.",
+            de:"Willkommen. Die OFN hat ihre Hauptstadt in Luxemburg-Stadt. Starte hier und gehe Station für Station durch Zweck, Prinzipien, Institutionen und Operationen.",
+            es:"Bienvenido. La capital de la OFN es la Ciudad de Luxemburgo. Empieza aquí y recorre parada por parada el propósito, los principios, las instituciones y las operaciones."
+          },
+          palette:{ a:"rgba(11,79,216,.18)", b:"rgba(255,183,3,.16)", c:"rgba(45,212,191,.14)" },
+          image: IMG_LUX,
+          details:{
+            summary:{
+              en:"This station anchors the route in Luxembourg City and sets the learning path.",
+              de:"Diese Station verankert die Route in Luxemburg-Stadt und legt den Lernpfad fest.",
+              es:"Esta parada sitúa la ruta en la Ciudad de Luxemburgo y define el recorrido de aprendizaje."
+            },
+            bullets:{
+              en:["Capital of the OFN: Luxembourg City.","Use Guided mode for a step-by-step tour.","Open the Charter anytime from the header."],
+              de:["Hauptstadt der OFN: Luxemburg-Stadt.","Geführter Modus für einen klaren Ablauf.","Die Charta kann jederzeit oben geöffnet werden."],
+              es:["Capital de la OFN: Ciudad de Luxemburgo.","Modo guiado para un recorrido paso a paso.","La Carta se puede abrir desde el encabezado."]
+            }
+          }
+        },
+        {
+          id:"purpose",
+          chip:{en:"Charter",de:"Charta",es:"Carta"},
+          tag:{en:"Purpose",de:"Zweck",es:"Propósito"},
+          title:{
+            en:"Purpose of the OFN",
+            de:"Zweck der OFN",
+            es:"Propósito de la OFN"
+          },
+          bullets:{
+            en:[
+              "Preserve the sovereignty, security, and constitutional legitimacy of Member States.",
+              "Provide a structured framework for cooperation among free and self-governing nations.",
+              "Act as a stabilizing force internationally and among its Members."
+            ],
+            de:[
+              "Souveränität, Sicherheit und verfassungsmäßige Legitimität der Mitgliedstaaten schützen.",
+              "Strukturierten Rahmen für Zusammenarbeit freier, selbstverwalteter Nationen bieten.",
+              "Als stabilisierende Kraft international und innerhalb der Mitglieder wirken."
+            ],
+            es:[
+              "Preservar la soberanía, la seguridad y la legitimidad constitucional de los Estados Miembros.",
+              "Ofrecer un marco estructurado de cooperación entre naciones libres y autogobernadas.",
+              "Actuar como fuerza estabilizadora a nivel internacional y entre sus miembros."
+            ]
+          },
+          palette:{ a:"rgba(11,79,216,.18)", b:"rgba(124,58,237,.16)", c:"rgba(255,183,3,.14)" },
+          details:{
+            summary:{
+              en:"The OFN is framed as sovereignty-first cooperation with institutional stability.",
+              de:"Die OFN ist als souveränitätsorientierte Zusammenarbeit mit institutioneller Stabilität angelegt.",
+              es:"La OFN se plantea como cooperación centrada en la soberanía y la estabilidad institucional."
+            },
+            bullets:{
+              en:["Sovereignty and constitutional legitimacy are primary.","Cooperation is structured (not ad-hoc).","Stability is an explicit mission."],
+              de:["Souveränität und Verfassungslage sind zentral.","Zusammenarbeit ist strukturiert (nicht spontan).","Stabilität ist ausdrücklich Ziel."],
+              es:["La soberanía y la legitimidad constitucional son prioritarias.","La cooperación es estructurada (no improvisada).","La estabilidad es una misión explícita."]
+            }
+          }
+        },
+        {
+          id:"order",
+          chip:{en:"Mandate",de:"Mandat",es:"Mandato"},
+          tag:{en:"Constitutional order",de:"Verfassungsordnung",es:"Orden constitucional"},
+          title:{
+            en:"Defending lawful governance",
+            de:"Rechtmäßige Ordnung schützen",
+            es:"Defender la gobernanza legal"
+          },
+          bullets:{
+            en:[
+              "Promote and defend democratic governance and constitutional order.",
+              "Oppose unlawful seizures of power, collapse, or systemic destabilization within Member States.",
+              "Assistance is guided by proportionality and institutional legitimacy."
+            ],
+            de:[
+              "Demokratische Regierungsführung und Verfassungsordnung fördern und verteidigen.",
+              "Unrechtmäßige Machtübernahmen, Zusammenbruch oder systemische Destabilisierung in Mitgliedstaaten entgegenwirken.",
+              "Hilfe folgt Verhältnismäßigkeit und institutioneller Legitimität."
+            ],
+            es:[
+              "Promover y defender la gobernanza democrática y el orden constitucional.",
+              "Oponerse a tomas ilegales de poder, colapso o desestabilización sistémica dentro de Estados Miembros.",
+              "La asistencia se guía por proporcionalidad y legitimidad institucional."
+            ]
+          },
+          palette:{ a:"rgba(45,212,191,.16)", b:"rgba(11,79,216,.16)", c:"rgba(124,58,237,.12)" },
+          details:{
+            summary:{
+              en:"This is the internal stability mandate — bounded by legality and proportionality.",
+              de:"Das ist das Stabilitätsmandat — begrenzt durch Rechtmäßigkeit und Verhältnismäßigkeit.",
+              es:"Este es el mandato de estabilidad interna — limitado por legalidad y proporcionalidad."
+            },
+            bullets:{
+              en:["Democratic/constitutional order is protected.","Triggers focus on unlawful overthrow or collapse.","Any response is framed as lawful and proportionate."],
+              de:["Demokratische/verfassungsmäßige Ordnung wird geschützt.","Auslöser sind unrechtmäßiger Umsturz oder Zusammenbruch.","Reaktionen sind rechtmäßig und verhältnismäßig."],
+              es:["Se protege el orden democrático/constitucional.","Los disparadores incluyen derrocamiento ilegal o colapso.","La respuesta debe ser legal y proporcional."]
+            }
+          }
+        },
+        {
+          id:"defense",
+          chip:{en:"Security",de:"Sicherheit",es:"Seguridad"},
+          tag:{en:"Collective defense",de:"Kollektivverteidigung",es:"Defensa colectiva"},
+          title:{
+            en:"Collective defense (including cyber & hybrid)",
+            de:"Kollektive Verteidigung (inkl. Cyber & Hybrid)",
+            es:"Defensa colectiva (incluye ciber e híbrido)"
+          },
+          bullets:{
+            en:[
+              "Collective defense against external aggression (armed, cyber, hybrid, coordinated destabilization).",
+              "Mechanisms are designed for rapid response in times of crisis."
+            ],
+            de:[
+              "Kollektivverteidigung gegen äußere Aggression (bewaffnet, cyber, hybrid, koordinierte Destabilisierung).",
+              "Mechanismen für schnelle Reaktion in Krisen."
+            ],
+            es:[
+              "Defensa colectiva contra agresión externa (armada, ciber, híbrida, desestabilización coordinada).",
+              "Mecanismos diseñados para una respuesta rápida en crisis."
+            ]
+          },
+          palette:{ a:"rgba(11,79,216,.18)", b:"rgba(45,212,191,.14)", c:"rgba(255,77,109,.12)" },
+          details:{
+            summary:{
+              en:"Security mechanisms cover modern threat types as well as traditional aggression.",
+              de:"Sicherheitsmechanismen umfassen moderne Bedrohungen wie auch klassische Aggression.",
+              es:"Los mecanismos de seguridad cubren amenazas modernas y agresiones tradicionales."
+            },
+            bullets:{
+              en:["Includes cyber/hybrid forms of aggression.","Designed for rapid response.","Operates through defined authorization structures."],
+              de:["Umfasst Cyber-/Hybridformen.","Auf schnelle Reaktion ausgelegt.","Arbeitet über definierte Autorisierungsstrukturen."],
+              es:["Incluye formas ciber/híbridas.","Diseñado para respuesta rápida.","Funciona con estructuras de autorización definidas."]
+            }
+          }
+        },
+        {
+          id:"principles1",
+          chip:{en:"Principles",de:"Prinzipien",es:"Principios"},
+          tag:{en:"Sovereign equality",de:"Souveräne Gleichheit",es:"Igualdad soberana"},
+          title:{
+            en:"Core principles",
+            de:"Grundprinzipien",
+            es:"Principios básicos"
+          },
+          bullets:{
+            en:[
+              "All Member States are sovereign and equal under this Charter.",
+              "No Member State has inherent authority over another except where defined by structure.",
+              "No authority may exercise powers not conferred by the Charter."
+            ],
+            de:[
+              "Alle Mitgliedstaaten sind souverän und gleich unter dieser Charta.",
+              "Kein Staat hat inhärente Autorität über einen anderen, außer wo die Struktur es definiert.",
+              "Keine Stelle darf Befugnisse ausüben, die die Charta nicht überträgt."
+            ],
+            es:[
+              "Todos los Estados Miembros son soberanos e iguales bajo esta Carta.",
+              "Ningún Estado tiene autoridad inherente sobre otro salvo donde lo defina la estructura.",
+              "Ninguna autoridad puede ejercer poderes no conferidos por la Carta."
+            ]
+          },
+          palette:{ a:"rgba(124,58,237,.16)", b:"rgba(11,79,216,.16)", c:"rgba(255,183,3,.12)" },
+          details:{
+            summary:{
+              en:"Authority is competence-limited. Equality is explicit.",
+              de:"Autorität ist kompetenzbegrenzt. Gleichheit ist ausdrücklich.",
+              es:"La autoridad está limitada por competencias. La igualdad es explícita."
+            },
+            bullets:{
+              en:["Equality is the baseline.","Powers must be explicitly conferred.","Institutional balance is maintained via defined organs."],
+              de:["Gleichheit ist die Grundlage.","Befugnisse müssen ausdrücklich übertragen sein.","Institutionelles Gleichgewicht durch definierte Organe."],
+              es:["La igualdad es la base.","Los poderes deben estar conferidos explícitamente.","Equilibrio institucional mediante órganos definidos."]
+            }
+          }
+        },
+        {
+          id:"principles2",
+          chip:{en:"Principles",de:"Prinzipien",es:"Principios"},
+          tag:{en:"Non-interference",de:"Nichteinmischung",es:"No injerencia"},
+          title:{
+            en:"Non-interference — with defined exceptions",
+            de:"Nichteinmischung — mit definierten Ausnahmen",
+            es:"No injerencia — con excepciones definidas"
+          },
+          bullets:{
+            en:[
+              "No domestic interference except where constitutional order is unlawfully overthrown, a material Charter breach occurs, or collective security is triggered.",
+              "Intervention requires lawful authorization under the Charter."
+            ],
+            de:[
+              "Keine Einmischung, außer bei unrechtmäßigem Umsturz, wesentlichem Chartabruch oder ausgelöster kollektiver Sicherheit.",
+              "Eingriff erfordert rechtmäßige Autorisierung nach der Charta."
+            ],
+            es:[
+              "No hay injerencia interna salvo derrocamiento ilegal del orden constitucional, infracción material de la Carta o activación de seguridad colectiva.",
+              "Toda intervención requiere autorización legal conforme a la Carta."
+            ]
+          },
+          palette:{ a:"rgba(255,183,3,.16)", b:"rgba(11,79,216,.14)", c:"rgba(45,212,191,.12)" },
+          details:{
+            summary:{
+              en:"Non-interference is the default; exceptions are explicit and authorization-bound.",
+              de:"Nichteinmischung ist Standard; Ausnahmen sind ausdrücklich und autorisierungsgebunden.",
+              es:"La no injerencia es la norma; las excepciones son explícitas y requieren autorización."
+            },
+            bullets:{
+              en:["Defined triggers narrow the exception.","Authorization is required.","Legality and proportionality remain central."],
+              de:["Definierte Auslöser begrenzen die Ausnahme.","Autorisierung ist erforderlich.","Rechtmäßigkeit/Verhältnismäßigkeit bleiben zentral."],
+              es:["Los disparadores definidos acotan la excepción.","Se requiere autorización.","Legalidad y proporcionalidad siguen siendo centrales."]
+            }
+          }
+        },
+        {
+          id:"organs",
+          chip:{en:"Institutions",de:"Institutionen",es:"Instituciones"},
+          tag:{en:"Organs",de:"Organe",es:"Órganos"},
+          title:{
+            en:"Organs of the OFN",
+            de:"Organe der OFN",
+            es:"Órganos de la OFN"
+          },
+          bullets:{
+            en:[
+              "Free Nations Council (legislative).",
+              "Upper Council (security authority; no single-member veto).",
+              "Secretary-General + Deputy and the Secretariat (executive/administrative).",
+              "Free Nations Court of Justice (independent judicial organ).",
+              "Peace & Civil Protection Service and operations frameworks."
+            ],
+            de:[
+              "Rat der Freien Nationen (Legislative).",
+              "Oberrat (Sicherheitsautorität; kein Einzelveto).",
+              "Generalsekretär + Stellvertreter und Sekretariat (Exekutive/Verwaltung).",
+              "Gerichtshof der Freien Nationen (unabhängig).",
+              "Friedens- & Zivilschutzdienst und Operationsrahmen."
+            ],
+            es:[
+              "Consejo de las Naciones Libres (legislativo).",
+              "Consejo Superior (autoridad de seguridad; sin veto individual).",
+              "Secretario General + adjunto y Secretaría (ejecutivo/administrativo).",
+              "Corte de Justicia de las Naciones Libres (órgano judicial independiente).",
+              "Servicio de Paz y Protección Civil y marcos operativos."
+            ]
+          },
+          palette:{ a:"rgba(11,79,216,.16)", b:"rgba(45,212,191,.14)", c:"rgba(124,58,237,.12)" },
+          image: IMG_BRUSSELS,
+          details:{
+            summary:{
+              en:"The Charter separates functions: legislative, security, executive, judicial, and operational support.",
+              de:"Die Charta trennt Funktionen: Legislative, Sicherheit, Exekutive, Justiz und operative Unterstützung.",
+              es:"La Carta separa funciones: legislativa, seguridad, ejecutiva, judicial y apoyo operativo."
+            },
+            bullets:{
+              en:["Clear separation of functions.","No power outside Charter competences.","Security actions are routed via defined organs."],
+              de:["Klare Funktionstrennung.","Keine Macht außerhalb der Charterkompetenzen.","Sicherheitsaktionen laufen über definierte Organe."],
+              es:["Separación clara de funciones.","Sin poder fuera de competencias conferidas.","Acciones de seguridad pasan por órganos definidos."]
+            }
+          }
+        },
+        {
+          id:"council",
+          chip:{en:"Legislature",de:"Legislative",es:"Legislativo"},
+          tag:{en:"Free Nations Council",de:"Rat der Freien Nationen",es:"Consejo de las Naciones Libres"},
+          title:{
+            en:"Free Nations Council (legislative body)",
+            de:"Rat der Freien Nationen (Legislative)",
+            es:"Consejo de las Naciones Libres (legislativo)"
+          },
+          bullets:{
+            en:[
+              "Delegations: minimum 2 delegates; up to 5 by membership size thresholds.",
+              "One vote per delegate; caucuses may form across at least two Member States.",
+              "Committees review proposals; resolutions pass by simple majority.",
+              "Charter amendments require a two-thirds majority of seated delegates."
+            ],
+            de:[
+              "Delegationen: mindestens 2, bis zu 5 Delegierte nach Schwellenwerten.",
+              "Eine Stimme je Delegiertem; Fraktionen über mindestens zwei Staaten möglich.",
+              "Ausschüsse prüfen Vorlagen; Beschlüsse mit einfacher Mehrheit.",
+              "Chartaänderungen benötigen zwei Drittel der sitzenden Delegierten."
+            ],
+            es:[
+              "Delegaciones: mínimo 2 delegados; hasta 5 según umbrales de tamaño.",
+              "Un voto por delegado; grupos parlamentarios entre al menos dos Estados.",
+              "Comités revisan propuestas; resoluciones por mayoría simple.",
+              "Enmiendas a la Carta requieren dos tercios de los delegados presentes."
+            ]
+          },
+          palette:{ a:"rgba(11,79,216,.18)", b:"rgba(255,183,3,.14)", c:"rgba(45,212,191,.12)" },
+          details:{
+            summary:{
+              en:"This is the legislative engine: proposals, committee review, and voting thresholds.",
+              de:"Das ist der legislative Kern: Vorlagen, Ausschussprüfung und Abstimmungsschwellen.",
+              es:"Es el motor legislativo: propuestas, revisión en comités y umbrales de votación."
+            },
+            bullets:{
+              en:["Representation via national delegations.","Committees structure debate and review.","Amendments require a higher threshold."],
+              de:["Repräsentation über nationale Delegationen.","Ausschüsse strukturieren Prüfung und Debatte.","Änderungen erfordern höhere Mehrheit."],
+              es:["Representación mediante delegaciones nacionales.","Los comités estructuran el debate y la revisión.","Las enmiendas exigen umbral más alto."]
+            }
+          }
+        },
+        {
+          id:"upper",
+          chip:{en:"Security",de:"Sicherheit",es:"Seguridad"},
+          tag:{en:"Upper Council",de:"Oberrat",es:"Consejo Superior"},
+          title:{
+            en:"Upper Council (security authority)",
+            de:"Oberrat (Sicherheitsautorität)",
+            es:"Consejo Superior (autoridad de seguridad)"
+          },
+          bullets:{
+            en:[
+              "8 rotary delegates elected for a fixed term.",
+              "Authorizes collective defense, deployments, sanctions, and emergency sessions.",
+              "Procedural: simple majority. Security actions: two-thirds. No veto."
+            ],
+            de:[
+              "8 rotierende Delegierte für feste Amtszeit.",
+              "Autorisiert Kollektivverteidigung, Einsätze, Sanktionen und Notsitzungen.",
+              "Verfahren: einfache Mehrheit. Sicherheit: zwei Drittel. Kein Veto."
+            ],
+            es:[
+              "8 delegados rotativos elegidos por un periodo fijo.",
+              "Autoriza defensa colectiva, despliegues, sanciones y sesiones de emergencia.",
+              "Procedimental: mayoría simple. Seguridad: dos tercios. Sin veto."
+            ]
+          },
+          palette:{ a:"rgba(255,77,109,.14)", b:"rgba(11,79,216,.14)", c:"rgba(124,58,237,.12)" },
+          details:{
+            summary:{
+              en:"Security authority is structured: higher thresholds, no single-member veto.",
+              de:"Sicherheitsautorität ist strukturiert: höhere Schwellen, kein Einzelveto.",
+              es:"La autoridad de seguridad es estructurada: umbrales altos, sin veto individual."
+            },
+            bullets:{
+              en:["Two-thirds for security actions.","Sanctions and deployments are authorized here.","Rotary composition supports balance."],
+              de:["Zwei Drittel für Sicherheitsmaßnahmen.","Sanktionen/Einsätze werden hier autorisiert.","Rotation unterstützt Ausgleich."],
+              es:["Dos tercios para acciones de seguridad.","Sanciones y despliegues se autorizan aquí.","Composición rotativa favorece equilibrio."]
+            }
+          }
+        },
+        {
+          id:"ops",
+          chip:{en:"Operations",de:"Operationen",es:"Operaciones"},
+          tag:{en:"FN-PSOC",de:"FN-PSOC",es:"FN-PSOC"},
+          title:{
+            en:"Peace & Stabilization Operations",
+            de:"Friedens- & Stabilisierungseinsätze",
+            es:"Operaciones de Paz y Estabilización"
+          },
+          bullets:{
+            en:[
+              "Emergency operational framework: FN-PSOC.",
+              "Pledged units remain under national command in peacetime; unified command during authorized mandates.",
+              "Upper Council authorizes deployments; emergency measures must be confirmed within 48 hours.",
+              "Commander nominated by the Secretary-General; confirmed by two-thirds of the Upper Council."
+            ],
+            de:[
+              "Operativer Notfallrahmen: FN-PSOC.",
+              "Zugesagte Einheiten bleiben im Frieden national geführt; einheitliches Kommando während Mandat.",
+              "Oberrat autorisiert Einsätze; Notmaßnahmen binnen 48 Stunden bestätigen.",
+              "Kommandeur vom Generalsekretär nominiert; durch zwei Drittel des Oberrats bestätigt."
+            ],
+            es:[
+              "Marco operativo de emergencia: FN-PSOC.",
+              "Unidades comprometidas permanecen bajo mando nacional en paz; mando unificado durante mandatos autorizados.",
+              "El Consejo Superior autoriza despliegues; medidas de emergencia deben confirmarse en 48 horas.",
+              "Comandante nominado por el Secretario General; confirmado por dos tercios del Consejo Superior."
+            ]
+          },
+          palette:{ a:"rgba(45,212,191,.16)", b:"rgba(255,183,3,.14)", c:"rgba(11,79,216,.12)" },
+          details:{
+            summary:{
+              en:"Operations are mandate-bound: defined scope, duration, command structure, and confirmation rules.",
+              de:"Einsätze sind mandatsgebunden: definierter Umfang, Dauer, Kommandostruktur und Bestätigung.",
+              es:"Las operaciones están vinculadas al mandato: alcance, duración, mando y reglas de confirmación."
+            },
+            bullets:{
+              en:["Unified operational command is temporary and mandate-limited.","Emergency actions require prompt confirmation.","Leadership appointment is structured."],
+              de:["Einheitliches Kommando ist temporär und mandatsbegrenzt.","Notmaßnahmen benötigen schnelle Bestätigung.","Führungseinsetzung ist strukturiert."],
+              es:["El mando unificado es temporal y limitado por mandato.","Las medidas de emergencia requieren confirmación rápida.","El nombramiento de liderazgo es estructurado."]
+            }
+          }
+        },
+        {
+          id:"day",
+          chip:{en:"Community",de:"Öffentlichkeit",es:"Comunidad"},
+          tag:{en:"Day of Free Nations",de:"Tag der Freien Nationen",es:"Día de las Naciones Libres"},
+          title:{
+            en:"Day of Free Nations (optional program)",
+            de:"Tag der Freien Nationen (optional)",
+            es:"Día de las Naciones Libres (opcional)"
+          },
+          text:{
+            en:"A public-facing program encouraging events, civic engagement, and projects supporting freedom worldwide — inviting citizens to contact local officials to support participation in the OFN.",
+            de:"Ein öffentliches Programm für Veranstaltungen, Engagement und Projekte zum Schutz der Freiheit weltweit — mit dem Aufruf, lokale Verantwortliche zur Unterstützung einer Beteiligung an der OFN zu kontaktieren.",
+            es:"Programa público que impulsa eventos, participación cívica y proyectos en favor de la libertad — invitando a la ciudadanía a contactar a autoridades locales para apoyar la participación en la OFN."
+          },
+          palette:{ a:"rgba(255,183,3,.18)", b:"rgba(45,212,191,.16)", c:"rgba(124,58,237,.14)" },
+          details:{
+            summary:{
+              en:"A civic engagement moment: events and outreach focused on freedom and cooperation.",
+              de:"Ein Moment der Bürgerbeteiligung: Events und Outreach für Freiheit und Zusammenarbeit.",
+              es:"Un momento de participación cívica: eventos y difusión centrados en libertad y cooperación."
+            },
+            bullets:{
+              en:["Events and supported projects.","Encourages civic outreach to officials.","Focus: continued protection of freedom."],
+              de:["Veranstaltungen und unterstützte Projekte.","Ermutigt zur Ansprache lokaler Verantwortungsträger.","Fokus: Schutz der Freiheit."],
+              es:["Eventos y proyectos apoyados.","Fomenta contacto cívico con autoridades.","Enfoque: protección continua de la libertad."]
+            }
+          }
+        }
+      ];
+
+      // Elements
+      const stage = document.getElementById("stage");
+      const world = document.getElementById("world");
+      const guy = document.getElementById("guy");
+      const bubble = document.getElementById("bubble");
+      const toast = document.getElementById("toast");
+
+      const buildBack = document.getElementById("buildBack");
+      const buildMid = document.getElementById("buildMid");
+      const buildFront = document.getElementById("buildFront");
+
+      const progressBar = document.getElementById("progressBar");
+      const progressLabel = document.getElementById("progressLabel");
+      const checkpointLabel = document.getElementById("checkpointLabel");
+
+      const btnCharter = document.getElementById("btnCharter");
+      const btnReset = document.getElementById("btnReset");
+      const btnPrev = document.getElementById("btnPrev");
+      const btnNext = document.getElementById("btnNext");
+
+      const modeFree = document.getElementById("modeFree");
+      const modeGuided = document.getElementById("modeGuided");
+
+      const langEN = document.getElementById("langEN");
+      const langDE = document.getElementById("langDE");
+      const langES = document.getElementById("langES");
+
+      const drawer = document.getElementById("drawer");
+      const drawerTitle = document.getElementById("drawerTitle");
+      const drawerDesc = document.getElementById("drawerDesc");
+      const drawerBody = document.getElementById("drawerBody");
+      const drawerClose = document.getElementById("drawerClose");
+
+      const boot = document.getElementById("boot");
+      const bootFill = document.getElementById("bootFill");
+      const bootP = document.getElementById("bootP");
+      const bootText = document.getElementById("bootText");
+
+      const uiTitle = document.getElementById("uiTitle");
+      const uiSubtitle = document.getElementById("uiSubtitle");
+      const uiHint = document.getElementById("uiHint");
+
+      const routeLabel = document.getElementById("routeLabel");
+      const routeDots = document.getElementById("routeDots");
+
+      const charterModal = document.getElementById("charterModal");
+      const charterModalTitle = document.getElementById("charterModalTitle");
+      const charterModalBody = document.getElementById("charterModalBody");
+      const charterModalX = document.getElementById("charterModalX");
+      const charterCancel = document.getElementById("charterCancel");
+      const charterOpen = document.getElementById("charterOpen");
+
+      // State
+      let lang = "en";
+      let mode = "free";
+      let viewW = window.innerWidth;
+
+      let scrollX = 0;
+      let targetX = 0;
+
+      const SPACING = 700;
+      const EDGE_PAD = 320;
+
+      const nodes = [];
+      let guidedTargetIndex = null;
+      let lastActiveIndex = -1;
+
+      function ui(){ return UI[lang]; }
+
+      function setSeg(btns, activeBtn){
+        for (const b of btns){
+          const on = (b === activeBtn);
+          b.classList.toggle("active", on);
+          b.setAttribute("aria-selected", on ? "true" : "false");
+        }
+      }
+
+      function showToast(msg){
+        toast.textContent = msg;
+        toast.classList.add("show");
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(()=>toast.classList.remove("show"), 1200);
+      }
+
+      function setBubble(msg, show=true){
+        bubble.textContent = msg;
+        bubble.classList.toggle("show", !!show);
+      }
+
+      function nudgeWalk(ms=220){
+        guy.classList.add("walking");
+        clearTimeout(nudgeWalk._t);
+        nudgeWalk._t = setTimeout(()=>guy.classList.remove("walking"), ms);
+      }
+
+      function applyPalette(pal){
+        if (!pal) return;
+        document.documentElement.style.setProperty("--bgA", pal.a);
+        document.documentElement.style.setProperty("--bgB", pal.b);
+        document.documentElement.style.setProperty("--bgC", pal.c);
+      }
+
+      function stationText(st, key){
+        const v = st[key];
+        if (!v) return null;
+        if (typeof v === "string") return v;
+        return v[lang] || v.en;
+      }
+
+      function computeStations(){
+        const x0 = Math.round(viewW/2 + EDGE_PAD);
+        const stations = STATION_MODEL.map((s, i) => ({ ...s, x: x0 + i * SPACING, index: i }));
+        const lastX = stations[stations.length - 1].x;
+        const worldW = Math.round(lastX + viewW/2 + EDGE_PAD);
+        return { stations, worldW };
+      }
+
+      let layout = computeStations();
+      let STATIONS = layout.stations;
+      let WORLD_W = layout.worldW;
+
+      function clearNodes(){
+        for (const n of nodes) n.el.remove();
+        nodes.length = 0;
+      }
+
+      function openDrawer(cp){
+        const d = cp.details || {};
+        drawerTitle.textContent = stationText(cp,"title") || "";
+        drawerDesc.textContent = `${stationText(cp,"tag")} • ${stationText(cp,"chip")}`;
+        drawerBody.innerHTML = "";
+
+        const block1 = document.createElement("div");
+        block1.className = "block";
+        const h4a = document.createElement("h4");
+        h4a.textContent = ui().quick;
+        const pa = document.createElement("div");
+        pa.style.color = "rgba(11,18,32,.70)";
+        pa.style.fontSize = "13px";
+        pa.style.lineHeight = "1.45";
+        pa.textContent = (d.summary && (d.summary[lang] || d.summary.en)) ? (d.summary[lang] || d.summary.en) : "";
+        block1.appendChild(h4a);
+        block1.appendChild(pa);
+        drawerBody.appendChild(block1);
+
+        const bullets = d.bullets && (d.bullets[lang] || d.bullets.en);
+        if (bullets && bullets.length){
+          const block2 = document.createElement("div");
+          block2.className = "block";
+          const h4b = document.createElement("h4");
+          h4b.textContent = ui().points;
+          block2.appendChild(h4b);
+          const ul = document.createElement("ul");
+          for (const b of bullets){
+            const li = document.createElement("li");
+            li.textContent = b;
+            ul.appendChild(li);
+          }
+          block2.appendChild(ul);
+          drawerBody.appendChild(block2);
+        }
+
+        drawer.classList.add("show");
+      }
+
+      function buildWorld(){
+        clearNodes();
+        world.style.width = WORLD_W + "px";
+
+        for (const cp of STATIONS){
+          const el = document.createElement("section");
+          el.className = "station";
+          el.style.left = cp.x + "px";
+
+          // scenic panel behind
+          const scenic = document.createElement("div");
+          scenic.className = "scenic";
+          if (cp.image){
+            scenic.innerHTML = `<div class="img" style="background-image:url('${cp.image}')"></div><div class="wash"></div>`;
+          } else {
+            scenic.style.display = "none";
+          }
+
+          const building = document.createElement("div");
+          building.className = "building";
+          building.innerHTML = `<div class="windows"></div><div class="door"></div>`;
+
+          const plaza = document.createElement("div");
+          plaza.className = "plaza";
+
+          const crowd = document.createElement("div");
+          crowd.className = "crowd";
+          crowd.innerHTML = `
+            <div class="person p1" style="left:40px; top:24px;"></div>
+            <div class="person p2" style="left:78px; top:18px;"></div>
+            <div class="person p3" style="left:120px; top:26px;"></div>
+            <div class="person p4" style="left:162px; top:20px;"></div>
+            <div class="person p1" style="left:198px; top:28px; opacity:.75;"></div>
+          `;
+          plaza.appendChild(crowd);
+
+          const plaque = document.createElement("article");
+          plaque.className = "plaque";
+
+          const kicker = document.createElement("div");
+          kicker.className = "kicker";
+
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.textContent = stationText(cp,"chip");
+
+          const tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = stationText(cp,"tag");
+
+          kicker.appendChild(chip);
+          kicker.appendChild(tag);
+
+          const h2 = document.createElement("h2");
+          h2.textContent = stationText(cp,"title");
+
+          plaque.appendChild(kicker);
+          plaque.appendChild(h2);
+
+          const text = stationText(cp,"text");
+          if (text){
+            const p = document.createElement("p");
+            p.textContent = text;
+            plaque.appendChild(p);
+          }
+
+          const bullets = cp.bullets && (cp.bullets[lang] || cp.bullets.en);
+          if (bullets && bullets.length){
+            const ul = document.createElement("ul");
+            for (const b of bullets){
+              const li = document.createElement("li");
+              li.textContent = b;
+              ul.appendChild(li);
+            }
+            plaque.appendChild(ul);
+          }
+
+          const footer = document.createElement("div");
+          footer.className = "plaqueFooter";
+          const detailsBtn = document.createElement("button");
+          detailsBtn.className = "btn";
+          detailsBtn.type = "button";
+          detailsBtn.textContent = ui().details;
+          detailsBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openDrawer(cp);
+          });
+          footer.appendChild(detailsBtn);
+          plaque.appendChild(footer);
+
+          plaque.addEventListener("click", (e) => {
+            if (e.target && e.target.closest && e.target.closest("button")) return;
+            openDrawer(cp);
+          });
+
+          el.appendChild(scenic);
+          el.appendChild(building);
+          el.appendChild(plaza);
+          el.appendChild(plaque);
+
+          world.appendChild(el);
+          nodes.push({ cp, el, plaque, building });
+        }
+      }
+
+      function buildRouteMap(){
+        routeDots.innerHTML = "";
+        for (const cp of STATIONS){
+          const d = document.createElement("div");
+          d.className = "dot";
+          d.dataset.title = stationText(cp,"chip");
+
+          d.addEventListener("click", () => {
+            // educational mode: allow reset always; allow neighbor jump in guided; free walk can jump
+            if (cp.index === 0){
+              goToCheckpoint(0, { guidedAuto:true });
+              return;
+            }
+            const cur = nearestIndex();
+            const ok = (mode === "guided") ? (Math.abs(cp.index - cur) <= 1) : true;
+            if (!ok){
+              showToast(lang==="de" ? "Im geführten Modus nur Nachbarstationen." : (lang==="es" ? "En modo guiado: solo paradas vecinas." : "In Guided mode: only neighboring stations."));
+              return;
+            }
+            goToCheckpoint(cp.index, { guidedAuto:true });
+          });
+
+          routeDots.appendChild(d);
+        }
+      }
+
+      function applyUI(){
+        uiTitle.textContent = ui().title;
+        uiSubtitle.innerHTML = ui().subtitle
+          .replace("Luxembourg City","<strong>Luxembourg City</strong>")
+          .replace("Luxemburg-Stadt","<strong>Luxemburg-Stadt</strong>")
+          .replace("Ciudad de Luxemburgo","<strong>Ciudad de Luxemburgo</strong>");
+
+        uiHint.innerHTML = ui().hint.replace("← →", '<span class="kbd">←</span><span class="kbd">→</span>');
+        modeFree.textContent = ui().free;
+        modeGuided.textContent = ui().guided;
+        btnCharter.textContent = ui().charter;
+        btnReset.textContent = ui().reset;
+        btnPrev.textContent = ui().prev;
+        btnNext.textContent = ui().next;
+        drawerClose.textContent = ui().close;
+        routeLabel.textContent = ui().route;
+
+        charterModalTitle.textContent = ui().warnTitle;
+        charterModalBody.textContent = ui().warnBody;
+        charterCancel.textContent = ui().cancel;
+        charterOpen.textContent = ui().open;
+        charterModalX.textContent = ui().close;
+
+        bootP.textContent = ui().guidedToast; // small “alive” text
+      }
+
+      function clampTarget(){
+        const maxX = Math.max(0, WORLD_W - viewW);
+        targetX = clamp(targetX, 0, maxX);
+      }
+
+      function nearestIndex(){
+        const center = scrollX + viewW/2;
+        let bestI=0, bestD=Infinity;
+        for (let i=0;i<STATIONS.length;i++){
+          const d = Math.abs(STATIONS[i].x - center);
+          if (d < bestD){ bestD=d; bestI=i; }
+        }
+        return bestI;
+      }
+
+      function goToCheckpoint(i, opts={}){
+        const cp = STATIONS[i];
+        targetX = cp.x - viewW/2;
+        clampTarget();
+        if (!opts.silent){
+          setBubble(`${ui().checkpoint} ${stationText(cp,"title")}`, true);
+          nudgeWalk(520);
+        }
+        if (mode === "guided" && opts.guidedAuto){
+          guidedTargetIndex = i;
+        }
+      }
+
+      function arriveAt(i){
+        const cp = STATIONS[i];
+        applyPalette(cp.palette);
+        showToast(`${ui().arrived} ${stationText(cp,"chip")}`);
+        const n = nodes[i];
+        if (n && n.plaque){
+          n.plaque.classList.remove("arrive");
+          void n.plaque.offsetWidth;
+          n.plaque.classList.add("arrive");
+        }
+      }
+
+      // Charter modal
+      function openCharterModal(){ charterModal.classList.add("show"); }
+      function closeCharterModal(){ charterModal.classList.remove("show"); }
+      btnCharter.addEventListener("click", openCharterModal);
+      charterCancel.addEventListener("click", closeCharterModal);
+      charterModalX.addEventListener("click", closeCharterModal);
+      charterModal.addEventListener("click", (e)=>{ if (e.target===charterModal) closeCharterModal(); });
+      charterOpen.addEventListener("click", ()=>{
+        closeCharterModal();
+        window.open(CHARTER_URL, "_blank", "noopener,noreferrer");
+      });
+
+      // Drawer close + outside click closes
+      drawerClose.addEventListener("click", ()=>drawer.classList.remove("show"));
+      stage.addEventListener("pointerdown", (e)=>{
+        const inside = e.target && e.target.closest && (e.target.closest("#drawer") || e.target.closest(".station"));
+        if (!inside) drawer.classList.remove("show");
+      }, { passive:true });
+
+      // Mode toggles
+      modeFree.addEventListener("click", ()=>{
+        mode="free";
+        setSeg([modeFree,modeGuided], modeFree);
+        setBubble(ui().dragToWalk, true);
+        setTimeout(()=>bubble.classList.remove("show"), 1400);
+      });
+      modeGuided.addEventListener("click", ()=>{
+        mode="guided";
+        setSeg([modeFree,modeGuided], modeGuided);
+        showToast(ui().guidedToast);
+      });
+
+      // Language toggles (now rebuilds world + route dots so station language updates)
+      function setLanguage(newLang){
+        const keepCenter = scrollX + viewW/2;
+        lang = newLang;
+        setSeg([langEN,langDE,langES], newLang==="en"?langEN:(newLang==="de"?langDE:langES));
+
+        applyUI();
+
+        // rebuild and preserve approximate position
+        layout = computeStations();
+        STATIONS = layout.stations;
+        WORLD_W = layout.worldW;
+        buildWorld();
+        buildRouteMap();
+
+        targetX = keepCenter - viewW/2;
+        clampTarget();
+        scrollX = targetX;
+
+        // refresh arrival palette at nearest station
+        const idx = nearestIndex();
+        arriveAt(idx);
+      }
+      langEN.addEventListener("click", ()=>setLanguage("en"));
+      langDE.addEventListener("click", ()=>setLanguage("de"));
+      langES.addEventListener("click", ()=>setLanguage("es"));
+
+      // Buttons
+      btnReset.addEventListener("click", ()=>{
+        drawer.classList.remove("show");
+        goToCheckpoint(0, { guidedAuto:true });
+      });
+      btnPrev.addEventListener("click", ()=>{
+        drawer.classList.remove("show");
+        goToCheckpoint(Math.max(0, nearestIndex()-1), { guidedAuto:true });
+      });
+      btnNext.addEventListener("click", ()=>{
+        drawer.classList.remove("show");
+        goToCheckpoint(Math.min(STATIONS.length-1, nearestIndex()+1), { guidedAuto:true });
+      });
+
+      // Drag/wheel/keyboard
+      let isDown=false, startX=0, startTarget=0;
+      stage.addEventListener("wheel", (e)=>{
+        e.preventDefault();
+        if (mode!=="free") return;
+        const dx = (Math.abs(e.deltaX)>Math.abs(e.deltaY)) ? e.deltaX : e.deltaY;
+        targetX += dx;
+        clampTarget();
+        nudgeWalk();
+      }, { passive:false });
+
+      function onPointerDown(e){
+        if (mode!=="free") return;
+        isDown=true;
+        stage.classList.add("dragging");
+        startX=e.clientX;
+        startTarget=targetX;
+        stage.setPointerCapture?.(e.pointerId);
+        setBubble(ui().walking, true);
+      }
+      function onPointerMove(e){
+        if (!isDown) return;
+        const dx=e.clientX-startX;
+        targetX=startTarget-dx;
+        clampTarget();
+        nudgeWalk();
+      }
+      function onPointerUp(){
+        isDown=false;
+        stage.classList.remove("dragging");
+        setBubble(ui().dragToWalk, true);
+        setTimeout(()=>bubble.classList.remove("show"), 900);
+      }
+      stage.addEventListener("pointerdown", onPointerDown);
+      stage.addEventListener("pointermove", onPointerMove);
+      stage.addEventListener("pointerup", onPointerUp);
+      stage.addEventListener("pointercancel", onPointerUp);
+
+      const held={left:false,right:false};
+      window.addEventListener("keydown", (e)=>{
+        if (e.key==="Escape"){ drawer.classList.remove("show"); closeCharterModal(); }
+        if (e.key==="ArrowLeft") held.left=true;
+        if (e.key==="ArrowRight") held.right=true;
+        if (e.key==="Home") btnReset.click();
+        if (e.key==="Enter" && mode==="guided") btnNext.click();
+      });
+      window.addEventListener("keyup", (e)=>{
+        if (e.key==="ArrowLeft") held.left=false;
+        if (e.key==="ArrowRight") held.right=false;
+      });
+
+      const REVEAL_DIST=620;
+      const ACTIVE_DIST=330;
+
+      function tick(){
+        let keyVel=0;
+        if (mode==="free"){
+          if (held.left) keyVel-=18;
+          if (held.right) keyVel+=18;
+        } else {
+          if (held.left) keyVel-=9;
+          if (held.right) keyVel+=9;
+        }
+        if (keyVel!==0){
+          targetX += keyVel;
+          clampTarget();
+          nudgeWalk();
+        }
+
+        if (mode==="guided" && guidedTargetIndex!==null){
+          const cp=STATIONS[guidedTargetIndex];
+          const desired=cp.x - viewW/2;
+          targetX = lerp(targetX, desired, 0.18);
+          clampTarget();
+          nudgeWalk(280);
+          if (Math.abs(targetX-desired)<0.8) guidedTargetIndex=null;
+        }
+
+        scrollX = lerp(scrollX, targetX, 0.10);
+        world.style.transform = `translate3d(${-scrollX}px, var(--camY), 0)`;
+
+        // skyline parallax
+        const x=-scrollX;
+        buildBack.style.transform = `translate3d(${x*0.14}px, 0, 0)`;
+        buildMid.style.transform  = `translate3d(${x*0.22}px, 0, 0)`;
+        buildFront.style.transform= `translate3d(${x*0.32}px, 0, 0)`;
+
+        // progress
+        const maxX=Math.max(1, WORLD_W-viewW);
+        const p=clamp(scrollX/maxX,0,1);
+        progressBar.style.width = `${p*100}%`;
+        progressLabel.textContent = `${Math.round(p*100)}%`;
+
+        const center=scrollX+viewW/2;
+        let active=0, bestD=Infinity;
+
+        for (let i=0;i<nodes.length;i++){
+          const n=nodes[i];
+          const d=Math.abs(n.cp.x - center);
+          if (d<bestD){ bestD=d; active=i; }
+
+          const show=d<REVEAL_DIST;
+          n.el.classList.toggle("show", show);
+          n.plaque.classList.toggle("show", show);
+
+          const near=d<ACTIVE_DIST;
+          n.el.classList.toggle("near", near);
+          n.plaque.classList.toggle("active", near);
+
+          n.building.style.transform = near ? "translateX(-50%) translateY(-1px)" : "translateX(-50%)";
+
+          const dot=routeDots.children[i];
+          if (dot) dot.classList.toggle("active", i===active);
+        }
+
+        checkpointLabel.textContent = `${ui().checkpoint} ${stationText(STATIONS[active],"chip")}`;
+
+        if (active!==lastActiveIndex){
+          lastActiveIndex=active;
+          arriveAt(active);
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      function runBoot(){
+        const lines =
+          lang==="de"
+          ? ["[OFN] Route wird geladen…","[OFN] Stationen werden aufgebaut…","[OFN] Stadtbild wird gerendert…","[OFN] Ansicht wird kalibriert…","[OFN] Bereit."]
+          : lang==="es"
+            ? ["[OFN] Cargando ruta…","[OFN] Construyendo paradas…","[OFN] Renderizando ciudad…","[OFN] Calibrando vista…","[OFN] Listo."]
+            : ["[OFN] Loading route…","[OFN] Building stations…","[OFN] Rendering cityscape…","[OFN] Calibrating view…","[OFN] Ready."];
+
+        let i=0, pct=0;
+        const step=()=>{
+          pct = clamp(pct + (12 + Math.random()*18), 0, 100);
+          bootFill.style.width = pct + "%";
+          if (i < lines.length && pct > (i+1)*(100/lines.length)-10){
+            i++;
+            bootText.textContent = lines.slice(0,i).join("\n");
+          }
+          if (pct<100) setTimeout(step, 180 + Math.random()*120);
+          else setTimeout(()=>boot.classList.add("hidden"), 420);
+        };
+        step();
+      }
+
+      window.addEventListener("resize", ()=>{
+        viewW=window.innerWidth;
+        layout=computeStations();
+        STATIONS=layout.stations;
+        WORLD_W=layout.worldW;
+        buildWorld();
+        buildRouteMap();
+        clampTarget();
+      });
+
+      function init(){
+        applyUI();
+        layout=computeStations();
+        STATIONS=layout.stations;
+        WORLD_W=layout.worldW;
+
+        buildWorld();
+        buildRouteMap();
+
+        goToCheckpoint(0, { silent:true });
+        scrollX=targetX;
+
+        applyPalette(STATIONS[0].palette);
+        arriveAt(0);
+
+        setBubble(ui().dragToWalk, true);
+        setTimeout(()=>bubble.classList.remove("show"), 3200);
+
+        runBoot();
+        requestAnimationFrame(tick);
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
